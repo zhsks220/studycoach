@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { parseExcelFile, mapExcelData, validateData, studentSchema } from '@/lib/excel'
-import { mapStudentToPrisma } from '@/lib/excel/mapper'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 
@@ -76,7 +75,9 @@ export async function POST(request: NextRequest) {
       validationResult.valid.map((student) =>
         prisma.student.create({
           data: {
-            ...mapStudentToPrisma(student),
+            name: student.name,
+            grade: String(student.grade),
+            phone: student.phone ?? undefined,
             academyId: user.academyId,
           },
         })
