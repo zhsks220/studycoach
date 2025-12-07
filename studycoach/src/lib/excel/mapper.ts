@@ -10,14 +10,11 @@ import { Prisma } from '@prisma/client'
  */
 export function mapStudentToPrisma(
   data: StudentData
-): Prisma.StudentCreateInput {
+): Omit<Prisma.StudentCreateInput, 'academy'> {
   return {
     name: data.name,
-    grade: data.grade,
-    class: data.class ?? undefined,
+    grade: String(data.grade), // Prisma expects String for grade
     phone: data.phone ?? undefined,
-    parentPhone: data.parentPhone ?? undefined,
-    address: data.address ?? undefined,
   }
 }
 
@@ -28,7 +25,7 @@ export function mapStudentToPrisma(
 export function mapGradeToPrismaInput(data: GradeData) {
   return {
     subject: data.subject,
-    semester: data.semester,
+    examName: `${data.semester} ${data.examType}`,
     examType: data.examType,
     score: data.score,
     examDate: new Date(data.examDate),
@@ -43,8 +40,8 @@ export function mapGradeToPrismaInput(data: GradeData) {
 export function mapGoalToPrismaInput(data: GoalData) {
   return {
     title: data.title,
-    currentScore: data.currentScore,
-    targetScore: data.targetScore,
+    currentValue: data.currentScore,
+    targetValue: data.targetScore,
     deadline: new Date(data.deadline),
     status: 'IN_PROGRESS' as const,
     studentName: data.studentName, // 임시로 저장 (나중에 studentId로 변환)
@@ -109,7 +106,7 @@ export function mapGradeToPrisma(
 ): Prisma.GradeCreateInput {
   return {
     subject: data.subject,
-    semester: data.semester,
+    examName: `${data.semester} ${data.examType}`,
     examType: data.examType,
     score: data.score,
     examDate: new Date(data.examDate),
@@ -128,8 +125,8 @@ export function mapGoalToPrisma(
 ): Prisma.GoalCreateInput {
   return {
     title: data.title,
-    currentScore: data.currentScore,
-    targetScore: data.targetScore,
+    currentValue: data.currentScore,
+    targetValue: data.targetScore,
     deadline: new Date(data.deadline),
     status: 'IN_PROGRESS',
     student: {
