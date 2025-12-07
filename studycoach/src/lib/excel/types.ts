@@ -48,10 +48,10 @@ export interface GoalExcelData {
 export interface StudentData {
   name: string
   grade: number
-  class?: number
-  phone?: string
-  parentPhone?: string
-  address?: string
+  class?: number | null
+  phone?: string | null
+  parentPhone?: string | null
+  address?: string | null
 }
 
 export interface GradeData {
