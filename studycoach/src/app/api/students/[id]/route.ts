@@ -13,9 +13,10 @@ const updateStudentSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const session = await auth()
     if (!session?.user) {
       return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
@@ -23,7 +24,7 @@ export async function GET(
 
     const student = await prisma.student.findUnique({
       where: {
-        id: params.id,
+        id: id,
         academyId: session.user.academyId,
       },
       include: {
@@ -58,9 +59,10 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const session = await auth()
     if (!session?.user) {
       return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
@@ -84,7 +86,7 @@ export async function PATCH(
 
     const student = await prisma.student.update({
       where: {
-        id: params.id,
+        id: id,
         academyId: session.user.academyId,
       },
       data: updateData,
@@ -102,9 +104,10 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const session = await auth()
     if (!session?.user) {
       return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
@@ -116,7 +119,7 @@ export async function DELETE(
 
     await prisma.student.delete({
       where: {
-        id: params.id,
+        id: id,
         academyId: session.user.academyId,
       },
     })
