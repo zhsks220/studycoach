@@ -108,7 +108,7 @@ export function validateData<T>(
       results.invalid.push({
         row: index + 2, // Excel 행 번호 (헤더 포함, 1-based)
         data: row,
-        errors: result.error.errors.map((e) => {
+        errors: result.error.issues.map((e) => {
           const path = e.path.join('.')
           return path ? `${path}: ${e.message}` : e.message
         }),
