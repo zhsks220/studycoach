@@ -1,0 +1,146 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Academy (학원)
+model Academy {
+  id              String   @id @default(cuid())
+  name            String
+  address         String?
+  phone           String?
+  subscriptionPlan String  @default("free")
+  subscriptionEnd DateTime?
+
+  users           User[]
+  students        Student[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// User (사용자: 원장, 강사, 학부모, 학생)
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  name            String
+  role            Role     @default(TEACHER)
+  password        String
+
+  academyId       String
+  academy         Academy  @relation(fields: [academyId], references: [id])
+
+  children        Student[] @relation("ParentToStudent")
+  studentProfile  Student?  @relation("StudentUser")
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  PARENT
+  STUDENT
+}
+
+// Student (학생)
+model Student {
+  id              String   @id @default(cuid())
+  name            String
+  grade           String
+  birthDate       DateTime?
+  phone           String?
+
+  academyId       String
+  academy         Academy  @relation(fields: [academyId], references: [id])
+
+  parents         User[]   @relation("ParentToStudent")
+  userId          String?  @unique
+  user            User?    @relation("StudentUser", fields: [userId], references: [id])
+
+  goals           Goal[]
+  grades          Grade[]
+  attendances     Attendance[]
+
+  notes           String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// Goal (목표)
+model Goal {
+  id              String     @id @default(cuid())
+  title           String
+  description     String?
+  targetValue     Float
+  currentValue    Float      @default(0)
+  unit            String     @default("점")
+  deadline        DateTime?
+  status          GoalStatus @default(IN_PROGRESS)
+
+  studentId       String
+  student         Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum GoalStatus {
+  IN_PROGRESS
+  ACHIEVED
+  FAILED
+  CANCELLED
+}
+
+// Grade (성적)
+model Grade {
+  id              String   @id @default(cuid())
+  examName        String
+  examDate        DateTime
+  examType        String   @default("정기고사")
+
+  subject         String
+  score           Float
+  maxScore        Float    @default(100)
+
+  studentId       String
+  student         Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  memo            String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// Attendance (출석)
+model Attendance {
+  id              String           @id @default(cuid())
+  date            DateTime
+  status          AttendanceStatus
+
+  studentId       String
+  student         Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  memo            String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([studentId, date])
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
