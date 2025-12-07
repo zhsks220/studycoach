@@ -47,9 +47,7 @@ export const gradeSchema = z.object({
   subject: z.string().min(1, '과목명은 필수입니다').max(50, '과목명은 50자 이하여야 합니다'),
   semester: z.string().min(1, '학기는 필수입니다'),
   examType: z.enum(['중간고사', '기말고사', '모의고사', '수행평가'], {
-    errorMap: () => ({
-      message: '시험종류는 중간고사, 기말고사, 모의고사, 수행평가 중 하나여야 합니다',
-    }),
+    message: '시험종류는 중간고사, 기말고사, 모의고사, 수행평가 중 하나여야 합니다',
   }),
   score: z
     .number()
