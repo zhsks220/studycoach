@@ -2,9 +2,26 @@ import { NextRequest, NextResponse } from 'next/server'
 import { parseExcelFile, mapExcelData, validateData, studentSchema } from '@/lib/excel'
 import { mapStudentToPrisma } from '@/lib/excel/mapper'
 import { prisma } from '@/lib/prisma'
+import { auth } from '@/auth'
 
 export async function POST(request: NextRequest) {
   try {
+    // 세션 확인
+    const session = await auth()
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+    }
+
+    // 사용자의 academyId 가져오기
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { academyId: true },
+    })
+
+    if (!user?.academyId) {
+      return NextResponse.json({ error: '학원 정보를 찾을 수 없습니다' }, { status: 400 })
+    }
+
     // FormData에서 파일 추출
     const formData = await request.formData()
     const file = formData.get('file') as File
@@ -58,7 +75,10 @@ export async function POST(request: NextRequest) {
     const createdStudents = await prisma.$transaction(
       validationResult.valid.map((student) =>
         prisma.student.create({
-          data: mapStudentToPrisma(student),
+          data: {
+            ...mapStudentToPrisma(student),
+            academyId: user.academyId,
+          },
         })
       )
     )
