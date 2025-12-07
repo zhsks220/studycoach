@@ -6,7 +6,7 @@ export default auth((req) => {
   const { pathname } = req.nextUrl
 
   // Public routes
-  const publicRoutes = ['/login', '/signup']
+  const publicRoutes = ['/login', '/signup', '/register']
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route))
 
   // If logged in and trying to access public route, redirect to home

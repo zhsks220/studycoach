@@ -75,8 +75,8 @@ export default function StudentsPage() {
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">지식 관리</h1>
-          <p className="text-muted-foreground mt-1">학생들의 학습 데이터를 통합 관리합니다.</p>
+          <h1 className="text-3xl font-bold tracking-tight">학생 관리</h1>
+          <p className="text-muted-foreground mt-1">학생 정보와 학습 데이터를 통합 관리합니다.</p>
         </div>
         <Button onClick={() => setIsCreateDialogOpen(true)} className="shadow-sm">
           <Plus className="mr-2 h-4 w-4" />
