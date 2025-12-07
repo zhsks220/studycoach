@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { BarChart3, TrendingUp, Users, BookOpen, Target, Award, Calendar } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
+import { motion } from 'framer-motion'
 import {
   LineChart,
   Line,
@@ -58,12 +59,19 @@ interface AnalyticsData {
 
 const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#6366f1']
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+
+interface TooltipPayload {
+  name: string
+  value: number
+  color: string
+}
+
+const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: TooltipPayload[]; label?: string }) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-background border border-border p-3 rounded-lg shadow-lg">
         <p className="font-medium text-sm mb-1">{label}</p>
-        {payload.map((entry: any, index: number) => (
+        {payload.map((entry: TooltipPayload, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
             {entry.name}: {typeof entry.value === 'number' ? entry.value.toFixed(1) : entry.value}
           </p>
@@ -73,6 +81,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   }
   return null
 }
+
 
 async function fetchAnalytics(): Promise<AnalyticsData> {
   const response = await fetch('/api/analytics')
@@ -100,7 +109,12 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="space-y-6"
+    >
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div>
@@ -283,8 +297,8 @@ export default function AnalyticsPage() {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ range, percent }) =>
-                      `${range}: ${(percent * 100).toFixed(0)}%`
+                    label={({ payload, percent }: { payload?: { range: string } & Record<string, unknown>; percent?: number }) =>
+                      `${payload?.range}: ${(percent ? percent * 100 : 0).toFixed(0)}%`
                     }
                     outerRadius={100}
                     fill="#8884d8"
@@ -341,10 +355,10 @@ export default function AnalyticsPage() {
                           index === 0
                             ? '#f59e0b'
                             : index === 1
-                            ? '#94a3b8'
-                            : index === 2
-                            ? '#fb923c'
-                            : '#3b82f6'
+                              ? '#94a3b8'
+                              : index === 2
+                                ? '#fb923c'
+                                : '#3b82f6'
                         }
                       />
                     ))}
@@ -443,6 +457,6 @@ export default function AnalyticsPage() {
           )}
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   )
 }

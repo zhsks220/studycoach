@@ -9,12 +9,28 @@ import { toast } from 'sonner'
 import { Separator } from '@/components/ui/separator'
 import { Upload, FileSpreadsheet, CheckCircle2, AlertCircle } from 'lucide-react'
 import { parseExcelFile, mapExcelData } from '@/lib/excel'
+import { motion } from 'framer-motion'
 
 interface UploadResult {
   valid: any[]
   invalid: any[]
   totalRows: number
   validRows: number
+}
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+}
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
 }
 
 export default function UploadPage() {
@@ -94,25 +110,32 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="show"
+      className="space-y-6"
+    >
       {/* 헤더 */}
-      <div className="flex items-center justify-between">
+      <motion.div variants={itemVariants} className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Upload className="h-8 w-8" />
             데이터 업로드
           </h1>
           <p className="text-muted-foreground mt-2">
             엑셀 파일을 업로드하여 대량의 데이터를 한번에 입력하세요
           </p>
         </div>
-      </div>
+        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+          <Upload className="h-6 w-6 text-primary" />
+        </div>
+      </motion.div>
 
       <Separator />
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* 메인 영역 - 업로드 및 미리보기 */}
-        <div className="lg:col-span-2 space-y-6">
+        <motion.div variants={itemVariants} className="lg:col-span-2 space-y-6">
           <Tabs
             defaultValue="students"
             onValueChange={(value) => {
@@ -120,16 +143,16 @@ export default function UploadPage() {
               setUploadResult(null)
             }}
           >
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="students" className="gap-2">
+            <TabsList className="grid w-full grid-cols-3 bg-muted/50 p-1">
+              <TabsTrigger value="students" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 <FileSpreadsheet className="h-4 w-4" />
                 학생 정보
               </TabsTrigger>
-              <TabsTrigger value="grades" className="gap-2">
+              <TabsTrigger value="grades" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 <FileSpreadsheet className="h-4 w-4" />
                 성적 정보
               </TabsTrigger>
-              <TabsTrigger value="goals" className="gap-2">
+              <TabsTrigger value="goals" className="gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 <FileSpreadsheet className="h-4 w-4" />
                 목표 정보
               </TabsTrigger>
@@ -144,7 +167,7 @@ export default function UploadPage() {
               />
 
               {uploadResult && currentType === 'students' && (
-                <>
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                   <UploadPreview
                     data={uploadResult.valid}
                     errors={uploadResult.invalid}
@@ -152,7 +175,7 @@ export default function UploadPage() {
                   />
 
                   {uploadResult.invalid.length > 0 && uploadResult.valid.length > 0 && (
-                    <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950">
+                    <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950 mt-4">
                       <CardContent className="pt-6">
                         <div className="flex items-start justify-between">
                           <div className="flex items-start gap-3">
@@ -177,7 +200,7 @@ export default function UploadPage() {
                       </CardContent>
                     </Card>
                   )}
-                </>
+                </motion.div>
               )}
             </TabsContent>
 
@@ -190,7 +213,7 @@ export default function UploadPage() {
               />
 
               {uploadResult && currentType === 'grades' && (
-                <>
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                   <UploadPreview
                     data={uploadResult.valid}
                     errors={uploadResult.invalid}
@@ -198,7 +221,7 @@ export default function UploadPage() {
                   />
 
                   {uploadResult.invalid.length > 0 && uploadResult.valid.length > 0 && (
-                    <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950">
+                    <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950 mt-4">
                       <CardContent className="pt-6">
                         <div className="flex items-start justify-between">
                           <div className="flex items-start gap-3">
@@ -223,7 +246,7 @@ export default function UploadPage() {
                       </CardContent>
                     </Card>
                   )}
-                </>
+                </motion.div>
               )}
             </TabsContent>
 
@@ -236,7 +259,7 @@ export default function UploadPage() {
               />
 
               {uploadResult && currentType === 'goals' && (
-                <>
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                   <UploadPreview
                     data={uploadResult.valid}
                     errors={uploadResult.invalid}
@@ -244,7 +267,7 @@ export default function UploadPage() {
                   />
 
                   {uploadResult.invalid.length > 0 && uploadResult.valid.length > 0 && (
-                    <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950">
+                    <Card className="border-orange-200 bg-orange-50 dark:bg-orange-950 mt-4">
                       <CardContent className="pt-6">
                         <div className="flex items-start justify-between">
                           <div className="flex items-start gap-3">
@@ -269,62 +292,74 @@ export default function UploadPage() {
                       </CardContent>
                     </Card>
                   )}
-                </>
+                </motion.div>
               )}
             </TabsContent>
           </Tabs>
-        </div>
+        </motion.div>
 
         {/* 사이드바 - 템플릿 다운로드 */}
-        <div className="space-y-6">
+        <motion.div variants={itemVariants} className="space-y-6">
           <TemplateDownload />
 
           {/* 업로드 가이드 */}
-          <Card>
-            <CardHeader>
+          <Card className="border-dashed">
+            <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-green-600" />
                 업로드 가이드
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="space-y-2">
-                <h4 className="font-medium text-sm">1단계: 템플릿 다운로드</h4>
-                <p className="text-xs text-muted-foreground">
+            <CardContent className="space-y-4">
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-[10px] font-bold">1</span>
+                  <h4 className="font-medium text-sm">템플릿 다운로드</h4>
+                </div>
+                <p className="text-xs text-muted-foreground pl-7">
                   원하는 데이터 타입의 템플릿을 다운로드합니다
                 </p>
               </div>
 
               <Separator />
 
-              <div className="space-y-2">
-                <h4 className="font-medium text-sm">2단계: 데이터 입력</h4>
-                <p className="text-xs text-muted-foreground">
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-[10px] font-bold">2</span>
+                  <h4 className="font-medium text-sm">데이터 입력</h4>
+                </div>
+                <p className="text-xs text-muted-foreground pl-7">
                   템플릿의 예시를 참고하여 데이터를 입력합니다
                 </p>
               </div>
 
               <Separator />
 
-              <div className="space-y-2">
-                <h4 className="font-medium text-sm">3단계: 파일 업로드</h4>
-                <p className="text-xs text-muted-foreground">
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-[10px] font-bold">3</span>
+                  <h4 className="font-medium text-sm">파일 업로드</h4>
+                </div>
+                <p className="text-xs text-muted-foreground pl-7">
                   작성한 엑셀 파일을 드래그하거나 선택하여 업로드합니다
                 </p>
               </div>
 
               <Separator />
 
-              <div className="space-y-2">
-                <h4 className="font-medium text-sm">4단계: 결과 확인</h4>
-                <p className="text-xs text-muted-foreground">
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-muted text-[10px] font-bold">4</span>
+                  <h4 className="font-medium text-sm">결과 확인</h4>
+                </div>
+                <p className="text-xs text-muted-foreground pl-7">
                   업로드 결과를 확인하고 오류가 있다면 수정합니다
                 </p>
               </div>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   )
 }

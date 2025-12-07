@@ -31,7 +31,7 @@ model User {
   id              String   @id @default(cuid())
   email           String   @unique
   name            String
-  role            Role     @default(TEACHER)
+  role            String   @default("TEACHER") // ADMIN, TEACHER, PARENT, STUDENT
   password        String
 
   academyId       String
@@ -42,13 +42,6 @@ model User {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-}
-
-enum Role {
-  ADMIN
-  TEACHER
-  PARENT
-  STUDENT
 }
 
 // Student (학생)
@@ -85,20 +78,13 @@ model Goal {
   currentValue    Float      @default(0)
   unit            String     @default("점")
   deadline        DateTime?
-  status          GoalStatus @default(IN_PROGRESS)
+  status          String     @default("IN_PROGRESS") // IN_PROGRESS, ACHIEVED, FAILED, CANCELLED
 
   studentId       String
   student         Student    @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-}
-
-enum GoalStatus {
-  IN_PROGRESS
-  ACHIEVED
-  FAILED
-  CANCELLED
 }
 
 // Grade (성적)
@@ -123,12 +109,12 @@ model Grade {
 
 // Attendance (출석)
 model Attendance {
-  id              String           @id @default(cuid())
+  id              String   @id @default(cuid())
   date            DateTime
-  status          AttendanceStatus
+  status          String   // PRESENT, ABSENT, LATE, EXCUSED
 
   studentId       String
-  student         Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student         Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   memo            String?
 
@@ -136,11 +122,4 @@ model Attendance {
   updatedAt       DateTime @updatedAt
 
   @@unique([studentId, date])
-}
-
-enum AttendanceStatus {
-  PRESENT
-  ABSENT
-  LATE
-  EXCUSED
 }

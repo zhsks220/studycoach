@@ -26,6 +26,7 @@ import {
 import { ThemeToggle } from '@/components/theme-toggle'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion'
 
 interface NavItem {
   title: string
@@ -81,106 +82,127 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Sidebar */}
+    <div className="flex min-h-screen bg-background text-foreground selection:bg-primary/10">
+      {/* Sidebar - Folk Style (Minimal, Clean) */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 transform bg-card shadow-lg transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0',
+          'fixed inset-y-0 left-0 z-50 w-64 transform bg-sidebar border-r border-sidebar-border transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <div className="flex h-16 items-center border-b px-6">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
+        <div className="flex h-16 items-center px-6">
+          <Link href="/" className="flex items-center space-x-2 group">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold shadow-sm transition-transform group-hover:scale-105">
               SC
             </div>
-            <span className="text-xl font-bold">StudyCoach</span>
+            <span className="text-xl font-bold tracking-tight text-sidebar-foreground">StudyCoach</span>
           </Link>
         </div>
 
-        <nav className="flex-1 space-y-1 px-3 py-4">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                )}
-              >
-                {item.icon}
-                <span>{item.title}</span>
-              </Link>
-            )
-          })}
+        <nav className="flex-1 px-3 py-4 space-y-1">
+          <LayoutGroup>
+            {navItems.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    'relative flex items-center space-x-3 rounded-md px-3 py-2 text-sm font-medium transition-colors outline-none',
+                    isActive
+                      ? 'text-primary'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="sidebar-active-indicator"
+                      className="absolute inset-0 rounded-md bg-sidebar-accent"
+                      initial={false}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 500,
+                        damping: 30,
+                      }}
+                    />
+                  )}
+                  <span className="relative z-10 flex items-center space-x-3">
+                    {item.icon}
+                    <span>{item.title}</span>
+                  </span>
+                </Link>
+              )
+            })}
+          </LayoutGroup>
         </nav>
 
-        <div className="border-t p-4">
-          <div className="text-xs text-muted-foreground">
-            {session?.user?.role === 'ADMIN' && '관리자'}
-            {session?.user?.role === 'TEACHER' && '강사'}
-            {session?.user?.role === 'PARENT' && '학부모'}
+        <div className="border-t p-4 mt-auto">
+          <div className="flex items-center space-x-3 rounded-lg bg-sidebar-accent/50 p-3">
+            <Avatar className="h-9 w-9 border border-sidebar-border">
+              <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                {session?.user?.name ? getInitials(session.user.name) : 'U'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col overflow-hidden">
+              <span className="truncate text-sm font-medium text-sidebar-foreground">{session?.user?.name}</span>
+              <span className="truncate text-xs text-muted-foreground capitalize">
+                {session?.user?.role === 'ADMIN' && '관리자'}
+                {session?.user?.role === 'TEACHER' && '강사'}
+                {session?.user?.role === 'PARENT' && '학부모'}
+              </span>
+            </div>
           </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <div className="flex flex-1 flex-col">
-        {/* Header */}
-        <header className="sticky top-0 z-40 flex h-16 items-center border-b bg-card px-4 shadow-sm lg:px-6">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            <Menu className="h-6 w-6" />
-          </Button>
+      <div className="flex flex-1 flex-col overflow-hidden">
+        {/* Header - Transparent/Minimal */}
+        <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-background/80 px-6 backdrop-blur-sm lg:px-8">
+          <div className="lg:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              <Menu className="h-6 w-6" />
+            </Button>
+          </div>
 
-          <div className="ml-auto flex items-center space-x-4">
+          <div className="flex items-center ml-auto gap-2">
             <ThemeToggle />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <Avatar>
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      {session?.user?.name ? getInitials(session.user.name) : 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">{session?.user?.name}</p>
-                    <p className="text-xs text-muted-foreground">{session?.user?.email}</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="text-red-600 cursor-pointer"
-                  onClick={() => signOut({ callbackUrl: '/login' })}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>로그아웃</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-foreground"
+              onClick={() => signOut({ callbackUrl: '/login' })}
+            >
+              <LogOut className="h-5 w-5" />
+            </Button>
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 p-6">{children}</main>
+        {/* Page Content with Transition */}
+        <main className="flex-1 overflow-auto p-6 lg:p-8 bg-background">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="h-full mx-auto max-w-7xl"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
+        </main>
       </div>
 
       {/* Overlay for mobile sidebar */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
