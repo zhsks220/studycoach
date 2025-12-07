@@ -1,6 +1,7 @@
-import { Role, GoalStatus, AttendanceStatus } from '@prisma/client'
-
-export type { Role, GoalStatus, AttendanceStatus }
+// Role, GoalStatus, AttendanceStatus are stored as strings in Prisma schema
+export type Role = 'ADMIN' | 'TEACHER' | 'PARENT' | 'STUDENT'
+export type GoalStatus = 'IN_PROGRESS' | 'ACHIEVED' | 'FAILED' | 'CANCELLED'
+export type AttendanceStatus = 'PRESENT' | 'ABSENT' | 'LATE' | 'EXCUSED'
 
 export interface User {
   id: string
