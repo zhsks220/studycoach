@@ -20,14 +20,8 @@ export async function GET(
     const buffer = createExcelTemplate(type as 'students' | 'grades' | 'goals')
     const fileName = getTemplateFileName(type as 'students' | 'grades' | 'goals')
 
-    // Buffer를 ArrayBuffer로 변환
-    const arrayBuffer = buffer.buffer.slice(
-      buffer.byteOffset,
-      buffer.byteOffset + buffer.byteLength
-    )
-
-    // 응답 반환
-    return new NextResponse(arrayBuffer, {
+    // 응답 반환 (Buffer를 직접 사용)
+    return new NextResponse(buffer, {
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'Content-Disposition': `attachment; filename="${encodeURIComponent(fileName)}"`,
