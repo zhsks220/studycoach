@@ -75,9 +75,7 @@ export const goalSchema = z.object({
   deadline: z.string().min(1, '마감일은 필수입니다'),
 })
 
-export type StudentData = z.infer<typeof studentSchema>
-export type GradeData = z.infer<typeof gradeSchema>
-export type GoalData = z.infer<typeof goalSchema>
+// 타입은 types.ts에서 export됨 (StudentData, GradeData, GoalData)
 
 /**
  * 데이터 검증 결과
