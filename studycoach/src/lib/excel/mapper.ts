@@ -2,7 +2,7 @@
  * 엑셀 데이터를 DB 모델로 매핑
  */
 
-import { StudentData, GradeData, GoalData } from './validator'
+import { StudentData, GradeData, GoalData } from './types'
 import { Prisma } from '@prisma/client'
 
 /**
